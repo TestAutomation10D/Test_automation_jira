@@ -17,4 +17,4 @@ jobs:
         run: |
           export GIT_PR_NUMBER="${{ github.event.number }}"
           export GIT_REPOSITORY_NAME="${{ github.event.repository.name }}"
-          export GIT_ORG_NAME="${{ github.event.repository }}"
+          export GIT_ORG_NAME="${{ github.repository_owner }}"
