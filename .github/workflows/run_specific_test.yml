@@ -1,0 +1,23 @@
+name: Run workflow for PR
+on:
+  workflow_dispatch:
+    inputs:
+      test_dir:
+        type: choice
+        description: What suite to run
+        required: false
+        options:
+        - run_test
+jobs:
+  Run_Selected_Tests:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Pull Request URL
+        run: |
+          export GIT_PR_NUMBER="${{ github.event.number }}"
+          export GIT_REPOSITORY_NAME="${{ github.event.repository.name }}"
+          export GIT_ORG_NAME="${{ github.event.repository.name }}"
