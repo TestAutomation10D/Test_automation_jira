@@ -10,7 +10,7 @@ on:
         - run_test
 jobs:
   Run_Selected_Tests:
-    runs-on: windows-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
         with:
