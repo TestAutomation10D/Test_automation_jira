@@ -41,7 +41,8 @@ jobs:
           echo "TC_SANITY_EXECUTION='${{ secrets.TC_SANITY_EXECUTION }}' | sed 's/./& /g'" >> $GITHUB_ENV
           echo "PREFIX_TICKET_VALUE='${{ secrets.PREFIX_TICKET_VALUE }}' | sed 's/./& /g'" >> $GITHUB_ENV
           echo "TOKEN='${{ secrets.AUTH_TOKEN }}' | sed 's/./& /g'" >> $GITHUB_ENV
-          echo "AUTH_TOKEN=$(echo ${env.TOKEN})" >> $GITHUB_ENV
+          echo '$TOKEN'
+          echo "AUTH_TOKEN=$echo'$TOKEN'" >> $GITHUB_ENV
           echo "FAIL_STATUS_TRANSITION='${{ secrets.FAIL_STATUS_TRANSITION }}' | sed 's/./& /g'" >> $GITHUB_ENV
           echo "JIRA_CONDITION='${{ secrets.JIRA_CONDITION }}' | sed 's/./& /g'" >> $GITHUB_ENV
           echo "JIRA_DOMAIN='${{ secrets.JIRA_DOMAIN }}' | sed 's/./& /g'" >> $GITHUB_ENV
