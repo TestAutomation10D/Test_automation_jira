@@ -29,5 +29,7 @@ jobs:
 
       - name: Run Sanity cases
         run: |
-          export TC_SANITY_EXECUTION=$TC_SANITY_EXECUTION
-          export AUTH_TOKEN=$AUTH_TOKEN
+          export TC_SANITY_EXECUTION="{{ env.TC_SANITY_EXECUTION }}"
+          export AUTH_TOKEN="{{ env.AUTH_TOKEN }}"
+          echo "$TC_SANITY_EXECUTION"
+          echo "$AUTH_TOKEN"
