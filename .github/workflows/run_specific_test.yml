@@ -32,12 +32,13 @@ jobs:
         shell: bash
         run: |
           echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+          echo "TC_SANITY_EXECUTION=${{ secrets.TC_SANITY_EXECUTION }}" >> $GITHUB_ENV
           echo ${{ env.BRANCH_NAME }}
 
       - name: Run Sanity cases
         run: |
           echo ${{ env.BRANCH_NAME }}
-          echo ${{ secrets.TC_SANITY_EXECUTION }} | sed 's/./& /g'
+          echo ${{ env.TC_SANITY_EXECUTION }} | sed 's/./& /g'
           echo ${{ secrets.PREFIX_TICKET_VALUE }} | sed 's/./& /g'
           echo ${{ secrets.AUTH_TOKEN }} | sed 's/./& /g'
 #          TC_SANITY_EXECUTION:"${{ secrets.TC_SANITY_EXECUTION }}"
