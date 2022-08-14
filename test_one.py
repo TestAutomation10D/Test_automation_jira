@@ -3,7 +3,6 @@ import subprocess
 
 
 def test_one():
-    out_file = open("BCD.TXT", "w")
-    sub = subprocess.call(['sed', 's/\"//g', os.environ.get("TOKEN")], stdout=out_file)
-    print(sub)
+    ff = open("env.txt", "r")
+    print(ff.read())
     assert 1 == 2
