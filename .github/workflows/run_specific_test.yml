@@ -66,4 +66,4 @@ jobs:
 
       - name: Execute python3
         run: |
-          pytest 
+          pytest test_one.py
