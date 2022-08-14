@@ -63,9 +63,7 @@ jobs:
           echo ${{ env.PASS_STATUS_TRANSITION }}
           echo ${{ env.TC_FUNCTIONAL_EXECUTION }}
           echo ${{ env.TC_INTEGRATION_EXECUTION }}
-      
+
       - name: Execute python3
         run: |
-          python3
-          import os
-          print(os.environ.get("AUTH_TOKEN"))
+          pytest 
