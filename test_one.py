@@ -2,5 +2,5 @@ import os
 
 
 def test_one():
-    print(os.environ.get("AUTH_TOKEN"))
+    print(os.environ.get("TOKEN"))
     assert 1 == 2
