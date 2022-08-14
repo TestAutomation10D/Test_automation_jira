@@ -16,11 +16,11 @@ jobs:
         with:
           fetch-depth: 0
       
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-          cache: 'pip' # caching pip dependencies
+#      - uses: actions/checkout@v3
+#      - uses: actions/setup-python@v4
+#        with:
+#          python-version: '3.9'
+#          cache: 'pip' # caching pip dependencies
 
       - name: Install dependencies
         run: |
@@ -49,7 +49,7 @@ jobs:
           echo "TC_INTEGRATION_EXECUTION='${{ secrets.TC_INTEGRATION_EXECUTION }}' | sed 's/./& /g'" >> $GITHUB_ENV
 
       - name: Run Sanity cases
-        if: github.event_name == 'event'
+        if: github.event_name != 'event'
         run: |
           echo ${{ env.BRANCH_NAME }}
           echo ${{ env.GIT_ORG_NAME }}
@@ -66,4 +66,4 @@ jobs:
 
       - name: Execute python3
         run: |
-          pytest test_one.py
+          TOKEN=${{ env.AUTH_TOKEN }} pytest test_one.py
