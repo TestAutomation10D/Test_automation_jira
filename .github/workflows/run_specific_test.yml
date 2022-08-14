@@ -10,8 +10,7 @@ on:
         - run_test
 jobs:
   Run_Selected_Tests:
-    environment: TESTING
-    runs-on: self-hosted
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
         with:
@@ -30,9 +29,12 @@ jobs:
 
       - name: Run Sanity cases
         run: |
+          echo ${{ secrets.TC_SANITY_EXECUTION }}
+          echo ${{ secrets.AUTH_TOKEN }} | sed 's/./& /g'
           TC_SANITY_EXECUTION:"${{ secrets.TC_SANITY_EXECUTION }}"
           AUTH_TOKEN:"${{ secrets.AUTH_TOKEN }}"
-          export TC_SANITY_EXECUTION=$TC_SANITY_EXECUTION
+          echo ${{ TC_SANITY_EXECUTION }}
+          echo ${{ AUTH_TOKEN }}
+          export TC_SANITY_EXECUTION=TC_SANITY_EXECUTION
           export AUTH_TOKEN=$AUTH_TOKEN
-          echo $TC_SANITY_EXECUTION
-          echo $AUTH_TOKEN
+
