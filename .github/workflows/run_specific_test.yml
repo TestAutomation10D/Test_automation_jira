@@ -50,7 +50,7 @@ jobs:
           echo "TC_INTEGRATION_EXECUTION='${{ secrets.TC_INTEGRATION_EXECUTION }}' | sed 's/./& /g'" >> $GITHUB_ENV
 
       - name: Run Sanity cases
-        if: github.event_name == 'event'
+        if: github.event_name != 'event'
         run: |
           echo ${{ env.BRANCH_NAME }}
           echo ${{ env.GIT_ORG_NAME }}
