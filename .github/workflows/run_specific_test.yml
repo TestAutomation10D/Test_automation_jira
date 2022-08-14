@@ -31,9 +31,8 @@ jobs:
         if: github.event_name != 'pull_request'
         shell: bash
         run: |
-          export BRANCH_NAME='$(echo ${GITHUB_REF#refs/heads/})'
+          echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
           echo $BRANCH_NAME
-        id: extract_branch
 
       - name: Run Sanity cases
         run: |
