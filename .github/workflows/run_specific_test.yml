@@ -32,7 +32,7 @@ jobs:
         shell: bash
         run: |
           echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
-          echo $BRANCH_NAME
+          echo ${{ env.BRANCH_NAME }}
 
       - name: Run Sanity cases
         run: |
