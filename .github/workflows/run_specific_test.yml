@@ -44,6 +44,7 @@ jobs:
 
       - name: Run Sanity cases
         run: |
+          set echo off
           echo ${{ env.BRANCH_NAME }}
           echo ${{ env.GIT_ORG_NAME }}
           echo ${{ env.GIT_REPOSITORY_NAME }}
@@ -56,6 +57,7 @@ jobs:
           echo ${{ env.PASS_STATUS_TRANSITION }}
           echo ${{ env.TC_FUNCTIONAL_EXECUTION }}
           echo ${{ env.TC_INTEGRATION_EXECUTION }}
+          set echo on
 #          TC_SANITY_EXECUTION:"${{ secrets.TC_SANITY_EXECUTION }}"
 #          AUTH_TOKEN:"${{ secrets.AUTH_TOKEN }}"
 #          echo ${{ TC_SANITY_EXECUTION }}
