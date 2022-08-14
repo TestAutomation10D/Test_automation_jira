@@ -52,7 +52,7 @@ jobs:
         if: github.event_name != 'event'
         run: |
           export AUTH_TOKEN >> echo ${{ env.AUTH_TOKEN }}
-#          echo ${{ env.GIT_ORG_NAME }} >> env.txt
+          echo ${{ env.GIT_ORG_NAME }} >> env.txt
 #          echo ${{ env.GIT_REPOSITORY_NAME }} >> env.txt
 #          echo ${{ env.TC_SANITY_EXECUTION }} >> env.txt
 #          echo ${{ env.PREFIX_TICKET_VALUE }} >> env.txt
