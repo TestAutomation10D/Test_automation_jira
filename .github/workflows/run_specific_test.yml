@@ -43,9 +43,8 @@ jobs:
           echo "TC_INTEGRATION_EXECUTION='${{ secrets.TC_INTEGRATION_EXECUTION }}' | sed 's/./& /g'" >> $GITHUB_ENV
 
       - name: Run Sanity cases
-        if: github.event_name != '***'
+        if: github.event_name == 'event'
         run: |
-          set echo off
           echo ${{ env.BRANCH_NAME }}
           echo ${{ env.GIT_ORG_NAME }}
           echo ${{ env.GIT_REPOSITORY_NAME }}
@@ -58,9 +57,4 @@ jobs:
           echo ${{ env.PASS_STATUS_TRANSITION }}
           echo ${{ env.TC_FUNCTIONAL_EXECUTION }}
           echo ${{ env.TC_INTEGRATION_EXECUTION }}
-          
-      - name: Apply python3
-        run: |
-          python3
-          import os
-          print(os.environ.get("AUTH_TOKEN"))
+      
