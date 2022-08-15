@@ -1,10 +1,20 @@
 import os
-import subprocess
+
+import requests
+import json
 
 
 def test_one():
-    if str(os.environ.get("AUTH_TOKEN")) == "c3VyeWEubXIramlyYTFAMTBkZWNvZGVycy5pbjpnRTByeFptRzBEalQ0SXo3TkU4YUYzM0Y=":
-        print("ENV value checked")
-    # ff = open("env.txt", "r")
-    # print(ff.read())
+    url = "https://testautomatejira.atlassian.net/rest/api/2/issue/TP-1"
+
+    token = os.environ.get("AUTH_TOKEN")
+    payload = {}
+    headers = {
+        'Authorization': f'Basic {token}',
+        'Content-Type': 'application/json'
+    }
+
+    response = requests.request("GET", url, headers=headers, data=payload)
+
+    print(response.text)
     assert 1 == 2
