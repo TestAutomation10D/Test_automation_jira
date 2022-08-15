@@ -8,7 +8,7 @@ def test_one():
 
     token = os.environ.get("AUTH_TOKEN")
     headers = {
-        'Authorization': f'Basic {token}',
+        'Authorization': "Basic "+token,
         'Content-Type': 'application/json'
     }
 
