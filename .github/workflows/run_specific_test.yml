@@ -9,7 +9,7 @@ on:
         options:
         - run_test
 jobs:
-  Run_Sanity_Tests:
+  Run_Selected_Tests:
     runs-on: self-hosted
     steps:
       - name: Checkout code
