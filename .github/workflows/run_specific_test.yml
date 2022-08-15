@@ -40,7 +40,7 @@ jobs:
           PREFIX_TICKET_VALUE: ${{ secrets.PREFIX_TICKET_VALUE }}
 #          GIT_REPOSITORY_NAME: ${{ github.event.repository.name }}
 #          GIT_ORG_NAME: ${{ github.repository_owner }}
-        if: ${{ secrets.TC_SANITY_EXECUTION }} == 'True'
+        if: ${{ env.TC_SANITY_EXECUTION }} == 'True'
         run: |
           echo "Sanity cases"
           echo $GIT_REPOSITORY_NAME
