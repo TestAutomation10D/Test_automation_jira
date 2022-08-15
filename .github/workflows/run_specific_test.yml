@@ -75,4 +75,4 @@ jobs:
 
       - name: Execute python3
         run: |
-          TOKEN=${{ env.AUTH_TOKEN }} pytest test_one.py
+          TOKEN="${{ env.AUTH_TOKEN }}" pytest test_one.py
