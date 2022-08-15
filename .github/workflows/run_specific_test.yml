@@ -18,12 +18,10 @@ jobs:
           fetch-depth: 0
 
       - name: Install dependencies
-        if: always()
         run: |
           pip install -r requirements.txt
 
       - name: SET Pull Request and ENV Information
-        if: always()
         run: |
           echo GIT_PR_NUMBER="12345" >> $GITHUB_ENV
           echo GIT_REPOSITORY_NAME="${{ github.event.repository.name }}" >> $GITHUB_ENV
@@ -43,7 +41,8 @@ jobs:
 
       - name: Execute Sanity Cases
         if: |
-          always() && 
+          success() ||
+          failure() &&
           ${{ env.TC_SANITY_EXECUTION }} == 'True'
         run: |
           echo "Sanity cases"
