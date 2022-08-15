@@ -6,7 +6,7 @@ on:
     types:
       - closed
 jobs:
-  Run_Selected_Tests:
+  Run_Test_Cases:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
