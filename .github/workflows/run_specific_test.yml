@@ -51,6 +51,7 @@ jobs:
       - name: Run Sanity cases
         if: github.event_name != 'event'
         run: |
+
           echo TC_SANITY_EXECUTION=$(echo ${{ env.TC_SANITY_EXECUTION_ENV }}) >> $GITHUB_ENV
           echo PREFIX_TICKET_VALUE=$(echo ${{ env.PREFIX_TICKET_VALUE_ENV }}) >> $GITHUB_ENV
           echo AUTH_TOKEN=$(echo ${{ env.AUTH_TOKEN_ENV }}) >> $GITHUB_ENV
@@ -75,4 +76,5 @@ jobs:
 
       - name: Execute python3
         run: |
-          TOKEN=$AUTH_TOKEN pytest test_one.py
+          secret = {{ secret.AUTH_TOKEN }}
+          TOKEN=secret pytest test_one.py
