@@ -17,6 +17,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install dependencies
+        if: always()
         run: |
           pip install -r requirements.txt
 
@@ -39,7 +40,7 @@ jobs:
 #          echo GIT_PR_NUMBER="${{ github.event.number }}" >> $GITHUB_ENV
 
       - name: Execute Sanity Cases
-        if: ${{ env.TC_SANITY_EXECUTION }} == 'True'
+        if: ${{ env.TC_SANITY_EXECUTION }} == 'True' && always()
         run: |
           echo "Sanity cases"
           echo $GIT_REPOSITORY_NAME
@@ -49,7 +50,7 @@ jobs:
           pytest test_one.py
 
       - name: Execute Functional Cases
-        if: ${{ env.TC_FUNCTIONAL_EXECUTION }} == 'True'
+        if: ${{ env.TC_FUNCTIONAL_EXECUTION }} == 'True' && always()
         run: |
           echo "Functional cases"
           echo $GIT_REPOSITORY_NAME
@@ -59,7 +60,7 @@ jobs:
           pytest test_one.py
 
       - name: Execute Integration Cases
-        if: ${{ env.TC_INTEGRATION_EXECUTION }} == 'True'
+        if: ${{ env.TC_INTEGRATION_EXECUTION }} == 'True' && always()
         run: |
           echo "Integration cases"
           echo $GIT_REPOSITORY_NAME
