@@ -4,7 +4,7 @@ import json
 
 
 def test_one():
-    url = "https://testautomatejira.atlassian.net/rest/api/2/issue/TP-1"
+    url = "https://testautomatejira.atlassian.net/rest/api/3/issue/TP-1"
 
     token = os.environ.get("AUTH_TOKEN")
     headers = {
