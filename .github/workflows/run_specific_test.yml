@@ -51,10 +51,10 @@ jobs:
       - name: Run Sanity cases
         if: github.event_name != 'event'
         run: |
-          export TC_SANITY_EXECUTION=$(echo ${{ env.TC_SANITY_EXECUTION_ENV }})
-          export PREFIX_TICKET_VALUE=$(echo ${{ env.PREFIX_TICKET_VALUE_ENV }})
-          export AUTH_TOKEN=$(echo ${{ env.AUTH_TOKEN_ENV }})
-          export FAIL_STATUS_TRANSITION=$(echo ${{ env.FAIL_STATUS_TRANSITION_ENV }})
+          export TC_SANITY_EXECUTION=$(echo ${{ env.TC_SANITY_EXECUTION_ENV }}) >> $GITHUB_ENV
+          export PREFIX_TICKET_VALUE=$(echo ${{ env.PREFIX_TICKET_VALUE_ENV }}) >> $GITHUB_ENV
+          export AUTH_TOKEN=$(echo ${{ env.AUTH_TOKEN_ENV }}) >> $GITHUB_ENV
+          export FAIL_STATUS_TRANSITION=$(echo ${{ env.FAIL_STATUS_TRANSITION_ENV }}) >> $GITHUB_ENV
           export JIRA_CONDITION=$(echo ${{ env.JIRA_CONDITION_ENV }})
           export JIRA_DOMAIN=$(echo ${{ env.JIRA_DOMAIN_ENV }})
           export PASS_STATUS_TRANSITION=$(echo ${{ env.PASS_STATUS_TRANSITION_ENV }})
