@@ -51,8 +51,7 @@ jobs:
       - name: Run Sanity cases
         if: github.event_name != 'event'
         run: |
-          echo ${{ env.AUTH_TOKEN }}
-          TOKEN=$(so.sh)
+          TOKEN=$(env.AUTH_TOKEN)
           echo $TOKEN
           X=$(echo ${{ env.JIRA_CONDITION }})
           echo $X
