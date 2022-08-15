@@ -39,6 +39,7 @@ jobs:
 #          echo GIT_PR_NUMBER="${{ github.event.number }}" >> $GITHUB_ENV
 
       - name: Execute Sanity Cases
+        if: ${{ always() }}
         run: |
           echo "Sanity cases"
           echo $GIT_REPOSITORY_NAME
@@ -48,6 +49,7 @@ jobs:
           pytest test_one.py
 
       - name: Execute Functional Cases
+        if: ${{ always() }}
         run: |
           echo "Functional cases"
           echo $GIT_REPOSITORY_NAME
@@ -57,6 +59,7 @@ jobs:
           pytest test_one.py
 
       - name: Execute Integration Cases
+        if: ${{ always() }}
         run: |
           echo "Integration cases"
           echo $GIT_REPOSITORY_NAME
