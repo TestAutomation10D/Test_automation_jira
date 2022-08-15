@@ -46,7 +46,7 @@ jobs:
           echo $GIT_ORG_NAME
           echo $BRANCH_NAME_ENV
           echo $GIT_PR_NUMBER
-          pytest /test_cases/api/*/sanity_cases
+#          pytest /test_cases/api/*/sanity_cases
 
       - name: Execute Functional Cases
         if: ${{ env.TC_FUNCTIONAL_EXECUTION }} == 'True'
