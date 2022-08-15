@@ -52,7 +52,7 @@ jobs:
 
       - name: Execute Functional Cases
 #         if: ${{ env.TC_FUNCTIONAL_EXECUTION }} == 'True'
-        if: always() || ${{ env.TC_FUNCTIONAL_EXECUTION }} == 'True'
+        if: failure() || ${{ env.TC_FUNCTIONAL_EXECUTION }} == 'True'
         run: |
           echo "Functional cases"
           echo $GIT_REPOSITORY_NAME
@@ -63,7 +63,7 @@ jobs:
 
       - name: Execute Integration Cases
 #         if: ${{ env.TC_INTEGRATION_EXECUTION }} == 'True'
-        if: always() || ${{ env.TC_INTEGRATION_EXECUTION }} == 'True'
+        if: failure() || ${{ env.TC_INTEGRATION_EXECUTION }} == 'True'
         run: |
           echo "Integration cases"
           echo $GIT_REPOSITORY_NAME
