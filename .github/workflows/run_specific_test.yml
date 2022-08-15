@@ -54,7 +54,8 @@ jobs:
 
       - name: Execute Functional Cases
         if: |
-          always() && 
+          success() ||
+          failure() &&
           ${{ env.TC_FUNCTIONAL_EXECUTION }} == 'True'
         run: |
           echo "Functional cases"
@@ -66,7 +67,8 @@ jobs:
 
       - name: Execute Integration Cases
         if: |
-          always() && 
+          success() ||
+          failure() &&
           ${{ env.TC_INTEGRATION_EXECUTION }} == 'True'
         run: |
           echo "Integration cases"
