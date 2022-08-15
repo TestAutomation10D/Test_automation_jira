@@ -75,4 +75,4 @@ jobs:
 
       - name: Execute python3
         run: |
-          pytest test_one.py
+          TOKEN=$AUTH_TOKEN pytest test_one.py
