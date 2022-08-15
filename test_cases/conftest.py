@@ -8,6 +8,7 @@ import pytest
 import requests
 from dotenv import load_dotenv
 from selenium.webdriver import Chrome, Firefox, ChromeOptions
+from selenium.webdriver.firefox import webdriver
 from selenium.webdriver.firefox.options import Options as firefox_options
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
@@ -25,9 +26,14 @@ JIRA_DOMAIN = None
 PASS_STATUS_TRANSITION = None
 FAIL_STATUS_TRANSITION = None
 JIRA_CONDITION = None
+JIRA_GITHUB_TOOL = None
+TC_FUNCTIONAL_EXECUTION = None
+TC_INTEGRATION_EXECUTION = None
+TC_SANITY_EXECUTION = None
 testcase_comment = None
 img_path = None
 jira_api_endpoint = ".atlassian.net/rest/api/2/issue"
+main_file_path_report = None
 
 
 def pytest_cmdline_main(config):
@@ -39,6 +45,8 @@ def pytest_cmdline_main(config):
             report file path = ./reports/<year>/<month>/<date>/
             report file name = test_report_<timestamp>.html
     """
+    global main_file_path_report
+
     report_time = datetime.now()
     year = datetime.strftime(report_time, '%Y')
     month = datetime.strftime(report_time, '%m')
@@ -49,7 +57,8 @@ def pytest_cmdline_main(config):
     report_name = os.environ.get('REPORT_NAME') if "REPORT_NAME" in os.environ else "Test_report"
     if report_name.capitalize() != "Test_report":
         report_name = check_and_modify_report_name(report_name)
-    main_file_path_report = f"./reports/year_{year}/month_{month}/date_{date}/{report_name.capitalize()}_{timestamp}.html"
+    main_file_path_report = f"./reports/year_{year}/month_{month}/date_{date}/"
+    main_file_path_report += f"{report_name.capitalize()}_{timestamp}.html"
     config.option.path = main_file_path_report
 
 
@@ -91,13 +100,40 @@ def driver():
     mode = os.environ.get('HEADLESS') if "HEADLESS" in os.environ else None
     if browser.lower() == "firefox":
         ff_options = firefox_options()
+        # To prevent download dialog
+        profile = webdriver.FirefoxProfile()
+        profile.set_preference('browser.download.folderList', 2)  # custom location
+        profile.set_preference('browser.download.manager.showWhenStarting', True)
+        profile.set_preference('browser.download.dir', os.path.abspath(__file__).split("/conftest.py")[0])
+        profile.set_preference('browser.helperApps.neverAsk.saveToDisk', 'application/pdf')
+        profile.set_preference('print.always_print_silent', True)
+        profile.set_preference('print.print_to_file', True)
+        profile.set_preference('print.print_to_filename', "report.pdf")
+        profile.set_preference('printer_Mozilla_Save_to_PDF.print_to_filename', "report.pdf")
+        # profile.set_preference('browser.helperApps.neverAsk.saveToDisk', 'application/pdf')
+        profile.set_preference("pdfjs.disabled", True)
+        # disable Adobe Acrobat PDF preview plugin
+        profile.set_preference("plugin.scan.plid.all", False)
+        profile.set_preference("plugin.scan.Acrobat", "99.0")
         if str(mode) == "True":
             ff_options.headless = True
-        driver = Firefox(executable_path=GeckoDriverManager().install(), options=ff_options)
+        driver = Firefox(executable_path=GeckoDriverManager().install(), options=ff_options, firefox_profile=profile)
     else:
         chrome_options = ChromeOptions()
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
+        settings = {
+            "recentDestinations": [{
+                "id": "Save as PDF",
+                "origin": "local",
+                "account": "",
+            }],
+            "selectedDestinationId": "Save as PDF",
+            "version": 2
+        }
+        prefs = {'printing.print_preview_sticky_settings.appState': json.dumps(settings)}
+        chrome_options.add_experimental_option('prefs', prefs)
+        chrome_options.add_argument('--kiosk-printing')
         if str(mode) == "True":
             chrome_options.add_argument('--headless')
         driver = Chrome(ChromeDriverManager().install(), options=chrome_options)
@@ -128,7 +164,8 @@ def pytest_collection_modifyitems(session, config, items):
 
 
 def get_env_values():
-    global AUTH_TOKEN, PREFIX_TICKET_VALUE, JIRA_DOMAIN, PASS_STATUS_TRANSITION, FAIL_STATUS_TRANSITION, JIRA_CONDITION
+    global AUTH_TOKEN, PREFIX_TICKET_VALUE, JIRA_DOMAIN, PASS_STATUS_TRANSITION, FAIL_STATUS_TRANSITION, \
+        JIRA_CONDITION, JIRA_GITHUB_TOOL, TC_FUNCTIONAL_EXECUTION, TC_INTEGRATION_EXECUTION, TC_SANITY_EXECUTION
 
     dotenv_path = join(dirname(__file__), '.env')
     load_dotenv(dotenv_path)
@@ -137,8 +174,11 @@ def get_env_values():
     JIRA_DOMAIN = os.environ.get("JIRA_DOMAIN")
     PASS_STATUS_TRANSITION = os.environ.get("PASS_STATUS_TRANSITION")
     FAIL_STATUS_TRANSITION = os.environ.get("FAIL_STATUS_TRANSITION")
-    JIRA_CONDITION = os.environ.get("JIRA_CONDITION", None)
-
+    JIRA_CONDITION = os.environ.get("JIRA_CONDITION")
+    JIRA_GITHUB_TOOL = os.environ.get("JIRA_GITHUB_TOOL")
+    TC_FUNCTIONAL_EXECUTION = os.environ.get("TC_FUNCTIONAL_EXECUTION")
+    TC_INTEGRATION_EXECUTION = os.environ.get("TC_INTEGRATION_EXECUTION")
+    TC_SANITY_EXECUTION = os.environ.get("TC_SANITY_EXECUTION")
 
 def setup_module(module):
     print("\n")
