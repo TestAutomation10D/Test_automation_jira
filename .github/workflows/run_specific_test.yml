@@ -37,22 +37,29 @@ jobs:
         if: github.event_name != 'pull_request'
         shell: bash
         run: |
-          echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
-          echo "TC_SANITY_EXECUTION='${{ secrets.TC_SANITY_EXECUTION }}' | sed 's/./& /g'" >> $GITHUB_ENV
-          echo "PREFIX_TICKET_VALUE='${{ secrets.PREFIX_TICKET_VALUE }}' | sed 's/./& /g'" >> $GITHUB_ENV
-          echo "AUTH_TOKEN='${{ secrets.AUTH_TOKEN }}' | sed 's/./& /g'" >> $GITHUB_ENV
-          echo "FAIL_STATUS_TRANSITION='${{ secrets.FAIL_STATUS_TRANSITION }}' | sed 's/./& /g'" >> $GITHUB_ENV
-          echo "JIRA_CONDITION='${{ secrets.JIRA_CONDITION }}' | sed 's/./& /g'" >> $GITHUB_ENV
-          echo "JIRA_DOMAIN='${{ secrets.JIRA_DOMAIN }}' | sed 's/./& /g'" >> $GITHUB_ENV
-          echo "PASS_STATUS_TRANSITION='${{ secrets.PASS_STATUS_TRANSITION }}' | sed 's/./& /g'" >> $GITHUB_ENV
-          echo "TC_FUNCTIONAL_EXECUTION='${{ secrets.TC_FUNCTIONAL_EXECUTION }}' | sed 's/./& /g'" >> $GITHUB_ENV
-          echo "TC_INTEGRATION_EXECUTION='${{ secrets.TC_INTEGRATION_EXECUTION }}' | sed 's/./& /g'" >> $GITHUB_ENV
+          echo "BRANCH_NAME_ENV=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+          echo "TC_SANITY_EXECUTION_ENV='${{ secrets.TC_SANITY_EXECUTION }}' | sed 's/./& /g'" >> $GITHUB_ENV
+          echo "PREFIX_TICKET_VALUE_ENV='${{ secrets.PREFIX_TICKET_VALUE }}' | sed 's/./& /g'" >> $GITHUB_ENV
+          echo "AUTH_TOKEN_ENV='${{ secrets.AUTH_TOKEN }}' | sed 's/./& /g'" >> $GITHUB_ENV
+          echo "FAIL_STATUS_TRANSITION_ENV='${{ secrets.FAIL_STATUS_TRANSITION }}' | sed 's/./& /g'" >> $GITHUB_ENV
+          echo "JIRA_CONDITION_ENV='${{ secrets.JIRA_CONDITION }}' | sed 's/./& /g'" >> $GITHUB_ENV
+          echo "JIRA_DOMAIN_ENV='${{ secrets.JIRA_DOMAIN }}' | sed 's/./& /g'" >> $GITHUB_ENV
+          echo "PASS_STATUS_TRANSITION_ENV='${{ secrets.PASS_STATUS_TRANSITION }}' | sed 's/./& /g'" >> $GITHUB_ENV
+          echo "TC_FUNCTIONAL_EXECUTION_ENV='${{ secrets.TC_FUNCTIONAL_EXECUTION }}' | sed 's/./& /g'" >> $GITHUB_ENV
+          echo "TC_INTEGRATION_EXECUTION_ENV='${{ secrets.TC_INTEGRATION_EXECUTION }}' | sed 's/./& /g'" >> $GITHUB_ENV
 
       - name: Run Sanity cases
         if: github.event_name != 'event'
         run: |
-          X=$(echo ${{ env.JIRA_CONDITION }})
-          echo $X
+          TC_SANITY_EXECUTION=$(echo ${{ env.TC_SANITY_EXECUTION_ENV }})
+          PREFIX_TICKET_VALUE=$(echo ${{ env.PREFIX_TICKET_VALUE_ENV }})
+          AUTH_TOKEN=$(echo ${{ env.AUTH_TOKEN_ENV }})
+          FAIL_STATUS_TRANSITION=$(echo ${{ env.FAIL_STATUS_TRANSITION_ENV }})
+          JIRA_CONDITION=$(echo ${{ env.JIRA_CONDITION_ENV }})
+          JIRA_DOMAIN=$(echo ${{ env.JIRA_DOMAIN_ENV }})
+          PASS_STATUS_TRANSITION=$(echo ${{ env.PASS_STATUS_TRANSITION_ENV }})
+          TC_FUNCTIONAL_EXECUTION=$(echo ${{ env.TC_FUNCTIONAL_EXECUTION_ENV }})
+          TC_INTEGRATION_EXECUTION=$(echo ${{ env.TC_INTEGRATION_EXECUTION_ENV }})
 #          TOKEN=$(env.AUTH_TOKEN)
 #          echo $TOKEN
 #          echo ${{ env.GIT_REPOSITORY_NAME }} >> env.txt
@@ -68,4 +75,4 @@ jobs:
 
       - name: Execute python3
         run: |
-          TOKEN="$echo ${{ env.AUTH_TOKEN }}" pytest test_one.py
+          TOKEN=$AUTH_TOKEN pytest test_one.py
