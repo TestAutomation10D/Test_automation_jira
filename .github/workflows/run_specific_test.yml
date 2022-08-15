@@ -46,7 +46,7 @@ jobs:
           echo $GIT_ORG_NAME
           echo $BRANCH_NAME_ENV
           echo $GIT_PR_NUMBER
-#          pytest /test_cases/api/*/sanity_cases
+          pytest test_one.py
 
       - name: Execute Functional Cases
         if: ${{ env.TC_FUNCTIONAL_EXECUTION }} == 'True'
@@ -56,7 +56,7 @@ jobs:
           echo $GIT_ORG_NAME
           echo $BRANCH_NAME_ENV
           echo $GIT_PR_NUMBER
-#          pytest /test_cases/api/*/integration_cases
+          pytest test_one.py
 
       - name: Execute Integration Cases
         if: ${{ env.TC_INTEGRATION_EXECUTION }} == 'True'
@@ -66,4 +66,4 @@ jobs:
           echo $GIT_ORG_NAME
           echo $BRANCH_NAME_ENV
           echo $GIT_PR_NUMBER
-#          pytest /test_cases/api/*/functional_cases
+          pytest test_one.py
