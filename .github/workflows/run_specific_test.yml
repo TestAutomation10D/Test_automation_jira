@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      
+
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
@@ -32,6 +32,7 @@ jobs:
           echo FAIL_STATUS_TRANSITION=$(echo ${{secrets.FAIL_STATUS_TRANSITION }}) >> $GITHUB_ENV
           echo JIRA_CONDITION=$(echo ${{ secrets.JIRA_CONDITION }}) >> $GITHUB_ENV
           echo JIRA_DOMAIN=$(echo ${{ secrets.JIRA_DOMAIN }}) >> $GITHUB_ENV
+          echo JIRA_GITHUB_TOOL=$(echo ${{ secrets.JIRA_GITHUB_TOOL }}) >> $GITHUB_ENV
           echo PASS_STATUS_TRANSITION=$(echo ${{ secrets.PASS_STATUS_TRANSITION }}) >> $GITHUB_ENV
           echo TC_FUNCTIONAL_EXECUTION=$(echo ${{ secrets.TC_FUNCTIONAL_EXECUTION }}) >> $GITHUB_ENV
           echo TC_INTEGRATION_EXECUTION=$(echo ${{ secrets.TC_INTEGRATION_EXECUTION }}) >> $GITHUB_ENV
@@ -56,7 +57,7 @@ jobs:
           echo $BRANCH_NAME_ENV
           echo $GIT_PR_NUMBER
 #          pytest /test_cases/api/*/integration_cases
-      
+
       - name: Execute Integration Cases
         if: ${{ env.TC_INTEGRATION_EXECUTION }} == 'True'
         run: |
