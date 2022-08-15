@@ -16,67 +16,34 @@ jobs:
         with:
           fetch-depth: 0
       
-#      - uses: actions/checkout@v3
-#      - uses: actions/setup-python@v4
-#        with:
-#          python-version: '3.9'
-#          cache: 'pip' # caching pip dependencies
-
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
 
       - name: GET Pull Request Information
         run: |
-          export GIT_PR_NUMBER="1234" 
+          export GIT_PR_NUMBER="1234" >> $GITHUB_ENV
           echo GIT_REPOSITORY_NAME="${{ github.event.repository.name }}" >> $GITHUB_ENV
           echo GIT_ORG_NAME="${{ github.repository_owner }}" >> $GITHUB_ENV
+          echo "BRANCH_NAME_ENV=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
 #          export GIT_PR_NUMBER="${{ github.event.number }}" >> $GITHUB_ENV
-      
-      - name: Extract branch name
-        if: github.event_name != 'pull_request'
-        shell: bash
-        run: |
-          echo " PR "
-#          echo "BRANCH_NAME_ENV=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
-#          echo "TC_SANITY_EXECUTION_ENV='${{ secrets.TC_SANITY_EXECUTION }}' | sed 's/./& /g'" >> $GITHUB_ENV
-#          echo "PREFIX_TICKET_VALUE_ENV='${{ secrets.PREFIX_TICKET_VALUE }}' | sed 's/./& /g'" >> $GITHUB_ENV
-#          echo "AUTH_TOKEN_ENV='${{ secrets.AUTH_TOKEN }}' | sed 's/./& /g'" >> $GITHUB_ENV
-#          echo "FAIL_STATUS_TRANSITION_ENV='${{ secrets.FAIL_STATUS_TRANSITION }}' | sed 's/./& /g'" >> $GITHUB_ENV
-#          echo "JIRA_CONDITION_ENV='${{ secrets.JIRA_CONDITION }}' | sed 's/./& /g'" >> $GITHUB_ENV
-#          echo "JIRA_DOMAIN_ENV='${{ secrets.JIRA_DOMAIN }}' | sed 's/./& /g'" >> $GITHUB_ENV
-#          echo "PASS_STATUS_TRANSITION_ENV='${{ secrets.PASS_STATUS_TRANSITION }}' | sed 's/./& /g'" >> $GITHUB_ENV
-#          echo "TC_FUNCTIONAL_EXECUTION_ENV='${{ secrets.TC_FUNCTIONAL_EXECUTION }}' | sed 's/./& /g'" >> $GITHUB_ENV
-#          echo "TC_INTEGRATION_EXECUTION_ENV='${{ secrets.TC_INTEGRATION_EXECUTION }}' | sed 's/./& /g'" >> $GITHUB_ENV
 
-      - name: Run Sanity cases
-        if: github.event_name != 'event'
-        run: |
-          echo ""
-#          echo TC_SANITY_EXECUTION=$(echo ${{ env.TC_SANITY_EXECUTION_ENV }}) >> $GITHUB_ENV
-#          echo PREFIX_TICKET_VALUE=$(echo ${{ env.PREFIX_TICKET_VALUE_ENV }}) >> $GITHUB_ENV
-#          echo AUTH_TOKEN=$(echo ${{ env.AUTH_TOKEN_ENV }}) >> $GITHUB_ENV
-#          echo FAIL_STATUS_TRANSITION=$(echo ${{ env.FAIL_STATUS_TRANSITION_ENV }}) >> $GITHUB_ENV
-#          echo JIRA_CONDITION=$(echo ${{ env.JIRA_CONDITION_ENV }}) >> $GITHUB_ENV
-#          echo JIRA_DOMAIN=$(echo ${{ env.JIRA_DOMAIN_ENV }}) >> $GITHUB_ENV
-#          echo PASS_STATUS_TRANSITION=$(echo ${{ env.PASS_STATUS_TRANSITION_ENV }}) >> $GITHUB_ENV
-#          echo TC_FUNCTIONAL_EXECUTION=$(echo ${{ env.TC_FUNCTIONAL_EXECUTION_ENV }}) >> $GITHUB_ENV
-#          echo TC_INTEGRATION_EXECUTION=$(echo ${{ env.TC_INTEGRATION_EXECUTION_ENV }}) >> $GITHUB_ENV
-#          TOKEN=$(env.AUTH_TOKEN)
-#          echo $TOKEN
-#          echo ${{ env.GIT_REPOSITORY_NAME }} >> env.txt
-#          echo ${{ env.TC_SANITY_EXECUTION }} >> env.txt
-#          echo ${{ env.PREFIX_TICKET_VALUE }} >> env.txt
-#          export AUTH_TOKEN >> echo ${{ env.AUTH_TOKEN }}
-#          echo ${{ env.FAIL_STATUS_TRANSITION }} >> env.txt
-#          echo ${{ env.JIRA_CONDITION }} >> env.txt
-#          echo ${{ env.JIRA_DOMAIN }} >> env.txt
-#          echo ${{ env.PASS_STATUS_TRANSITION }} >> env.txt
-#          echo ${{ env.TC_FUNCTIONAL_EXECUTION }} >> env.txt
-#          echo ${{ env.TC_INTEGRATION_EXECUTION }} >> env.txt
-
-      - name: Execute python3
+      - name: Execute Sanity Cases
         env:
           AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
+          TC_SANITY_EXECUTION: ${{ secrets.TC_SANITY_EXECUTION }}
+          JIRA_CONDITION: ${{ secrets.JIRA_CONDITION }}
+          JIRA_DOMAIN: ${{ secrets.JIRA_DOMAIN }}
+          JIRA_GITHUB_TOOL: ${{ secrets.JIRA_GITHUB_TOOL }}
+          FAIL_STATUS_TRANSITION: ${{ secrets.FAIL_STATUS_TRANSITION }}
+          PASS_STATUS_TRANSITION: ${{ secrets.PASS_STATUS_TRANSITION }}
+          PREFIX_TICKET_VALUE: ${{ secrets.PREFIX_TICKET_VALUE }}
+#          GIT_REPOSITORY_NAME: ${{ github.event.repository.name }}
+#          GIT_ORG_NAME: ${{ github.repository_owner }}
+        if: TC_SANITY_EXECUTION == True
         run: |
-          pytest test_one.py
+          echo "Sanity cases"
+          echo $GIT_REPOSITORY_NAME
+          echo $GIT_ORG_NAME
+          echo $BRANCH_NAME_ENV
+#          pytest /test_cases/api/*/sanity_cases
