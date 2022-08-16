@@ -33,7 +33,8 @@ jobs:
           echo PASS_STATUS_TRANSITION=$(echo ${{ secrets.PASS_STATUS_TRANSITION }}) >> $GITHUB_ENV
           echo TC_FUNCTIONAL_EXECUTION=$(echo ${{ secrets.TC_FUNCTIONAL_EXECUTION }}) >> $GITHUB_ENV
           echo TC_INTEGRATION_EXECUTION=$(echo ${{ secrets.TC_INTEGRATION_EXECUTION }}) >> $GITHUB_ENV
-
+          echo JQL_COLUMN_NAME=$(echo ${{ secrets.JQL_COLUMN_NAME }}) >> $GITHUB_ENV
+          echo JQL_ISSUE_TYPE=$(echo ${{ secrets.JQL_ISSUE_TYPE }}) >> $GITHUB_ENV
 
       - name: Execute Sanity Cases
         if: ${{ always() && env.TC_SANITY_EXECUTION == 'True' }}
