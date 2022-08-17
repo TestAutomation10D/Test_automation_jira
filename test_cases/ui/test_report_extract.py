@@ -14,6 +14,7 @@ def test_report_ext(driver):
     csv_test_metrics = (By.XPATH, '(//*[@title="CSV"])[2]')
 
     driver.get("file:////home/suryamr/jira_org/reports/year_2022/month_08/date_16/Test_report_2022_08_16_10_16_56.html")
+    assert 1 == 2
     time.sleep(4)
     driver.execute_script("var a = document.querySelector('title'); a.innerText = 'SANITY REPORT'")
     driver.execute_script("""var a = document.querySelector('[class="header__title"]'); a.innerText = 'SANITY REPORT'""")
@@ -28,3 +29,4 @@ def test_report_ext(driver):
     # driver.find_element(*print_pdf_test_metrics).click()
     time.sleep(4)
     driver.quit()
+

@@ -2,6 +2,7 @@ import copy
 import logging
 import os
 import sys
+import time
 from datetime import datetime
 from os.path import join, dirname
 import json
@@ -9,6 +10,7 @@ import pytest
 import requests
 from dotenv import load_dotenv
 from selenium.webdriver import Chrome, Firefox, ChromeOptions
+from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox import webdriver
 from selenium.webdriver.firefox.options import Options as firefox_options
 from webdriver_manager.chrome import ChromeDriverManager
@@ -26,7 +28,8 @@ testcase_comment = None
 img_path = None
 jira_api_endpoint = ".atlassian.net/rest/api/2/issue"
 main_file_path_report = None
-result_value = 0
+result_value = "0"
+
 
 def pytest_cmdline_main(config):
     """
@@ -159,7 +162,7 @@ def get_env_values():
     load_dotenv(dotenv_path)
     env_vars = {
         "AUTH_TOKEN": os.environ.get("AUTH_TOKEN", None),
-        "PREFIX_TICKET_VALUE": os.environ.get("PREFIX_TICKET_VALUE", None),
+        "JIRA_PROJECT_NAME": os.environ.get("JIRA_PROJECT_NAME", None),
         "PASS_STATUS_TRANSITION": os.environ.get("PASS_STATUS_TRANSITION", None),
         "JIRA_DOMAIN": os.environ.get("JIRA_DOMAIN", None),
         "FAIL_STATUS_TRANSITION": os.environ.get("FAIL_STATUS_TRANSITION", None),
@@ -186,9 +189,57 @@ def setup_module():
 @pytest.fixture(scope="session", autouse=True)
 def teardown_module():
     print("\n")
+    yield
     logger.info("Running teardown for SESSION")
+    try:
+        test_report_ext()
+    except Exception as exp:
+        print(exp, "Exporting results files is failed")
     env_vars["report_status"] = result_value
-    jira_obj = JiraIntegration(**env_vars)
+    if env_vars["JIRA_CONDITION"] == 'True':
+        jira_obj = JiraIntegration(**env_vars)
+        jira_obj.find_ticket_id_in_jira()
+        jira_obj.make_build_status_comment()
+        jira_obj.add_comment_to_ticket_id()
+        jira_obj.make_transitions_to_ticket()
+
+
+def test_report_ext():
+    suite_board = (By.CSS_SELECTOR, '[href="#suites"]')
+    test_metrics_board = (By.CSS_SELECTOR, '[href="#test-metrics"]')
+    dashboard_pdf = (By.CSS_SELECTOR, '[id="download"] i')
+    # print_pdf_test_suite = (By.CSS_SELECTOR, '[class="fa fa-print"]')
+    # print_pdf_test_metrics = (By.XPATH, '(//*[@class="fa fa-print"])[2]')
+    csv_suite = (By.CSS_SELECTOR, '[title="CSV"]')
+    csv_test_metrics = (By.XPATH, '(//*[@title="CSV"])[2]')
+
+    ff_options = firefox_options()
+    # To prevent download dialog for save as PDF
+    profile = webdriver.FirefoxProfile()
+    profile.set_preference('browser.download.folderList', 2)  # custom location
+    profile.set_preference('browser.download.manager.showWhenStarting', False)
+    report_path = main_file_path_report.split("/")
+    report_path = main_file_path_report.replace(report_path[len(report_path) - 1], "")[1:]
+    profile.set_preference('browser.download.dir', os.getcwd() + report_path + "downloaded_files/")
+    profile.set_preference('browser.helperApps.neverAsk.saveToDisk', 'text/plain,application/pdf')
+    profile.set_preference('print.always_print_silent', True)
+    profile.set_preference("pdfjs.disabled", True)
+    # ff_options.headless = False
+    time.sleep(4)
+    driver = Firefox(executable_path=GeckoDriverManager().install(), options=ff_options, firefox_profile=profile)
+    driver.get("file:///"+os.getcwd()+main_file_path_report[1:])
+    time.sleep(4)
+    driver.execute_script("var a = document.querySelector('title'); a.innerText = 'SANITY REPORT'")
+    driver.execute_script("""var a = document.querySelector('[class="header__title"]'); a.innerText = 'SANITY REPORT'""")
+    driver.find_element(*dashboard_pdf).click()
+    time.sleep(2)
+    driver.find_element(*suite_board).click()
+    driver.find_element(*csv_suite).click()
+    time.sleep(3)
+    driver.find_element(*test_metrics_board).click()
+    driver.find_element(*csv_test_metrics).click()
+    time.sleep(4)
+    driver.quit()
 
 
 def get_pytest_id(length):
@@ -213,7 +264,7 @@ def pytest_runtest_makereport(item):
     #         if ticket_id in result.nodeid:
     #             send_results_to_jira(result, ticket_id)
     #         elif ticket_id not in result.nodeid:
-    #             ticket_id = f"{PREFIX_TICKET_VALUE}"+(result.nodeid.replace("_", "-")).split(f"{PREFIX_TICKET_VALUE}")[1][:-1]
+    #             ticket_id = f"{JIRA_PROJECT_NAME}"+(result.nodeid.replace("_", "-")).split(f"{JIRA_PROJECT_NAME}")[1][:-1]
     #             send_results_to_jira(result, ticket_id)
     #     except Exception as e:
     #         print("Error", e)
@@ -234,14 +285,14 @@ def collect_screenshot(item, report):
     location = getattr(report, 'location', [])
 
     if report.outcome in ["failed"]:
-        result_value = 1
+        result_value = "1"
 
     if "ui" in location[0] and (report.when == 'call' or report.when == "setup"):
         if report.outcome in ["skipped", "failed"]:
-            _capture_screenshot(report)
+            _capture_screenshot()
 
 
-def _capture_screenshot(report):
+def _capture_screenshot():
     """
         This method is used to attach the screenshot on UI failures to HTML report file
     """
@@ -258,8 +309,8 @@ def _capture_screenshot(report):
         logging.error(f'{error_msg}  Selenium driver not valid.')
 
 # def save_failed_details_on_dir(report):
-#     ticket_id = f"{PREFIX_TICKET_VALUE}" + \
-#                 (report.nodeid.replace("_", "-")).split(f"{PREFIX_TICKET_VALUE}")[1][:-1]
+#     ticket_id = f"{JIRA_PROJECT_NAME}" + \
+#                 (report.nodeid.replace("_", "-")).split(f"{JIRA_PROJECT_NAME}")[1][:-1]
 #     report_time = datetime.now()
 #     timestamp = datetime.strftime(report_time, '%Y_%m_%d_%H_%M_%S')
 #     file_exact_path = os.path.abspath(__file__).split("/conftest.py")[0]

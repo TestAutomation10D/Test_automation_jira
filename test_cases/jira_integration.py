@@ -4,12 +4,13 @@ import os
 from os.path import join, dirname
 import requests
 from dotenv import load_dotenv
+import ast
 
 
 class JiraIntegration:
     def __init__(self,
                  AUTH_TOKEN=None,
-                 PREFIX_TICKET_VALUE=None,
+                 JIRA_PROJECT_NAME=None,
                  JIRA_DOMAIN=None,
                  PASS_STATUS_TRANSITION=None,
                  FAIL_STATUS_TRANSITION=None,
@@ -26,12 +27,12 @@ class JiraIntegration:
                  JQL_ISSUE_TYPE=None,
                  report_status=None):
         self.auth_token = AUTH_TOKEN
-        self.prefix_ticket_value = PREFIX_TICKET_VALUE
+        self.jira_project_name = JIRA_PROJECT_NAME
         self.jira_domain = JIRA_DOMAIN
         self.pass_status_transition = PASS_STATUS_TRANSITION
         self.fail_status_transition = FAIL_STATUS_TRANSITION
-        self.jira_condition = JIRA_CONDITION
-        self.jira_github_tool = JIRA_GITHUB_TOOL
+        self.jira_condition = ast.literal_eval(JIRA_CONDITION)
+        self.jira_github_tool = ast.literal_eval(JIRA_GITHUB_TOOL)
         self.tc_functional_execution = TC_FUNCTIONAL_EXECUTION
         self.tc_integration_execution = TC_INTEGRATION_EXECUTION
         self.tc_sanity_execution = TC_SANITY_EXECUTION
@@ -59,9 +60,53 @@ class JiraIntegration:
 
     def find_ticket_id_in_jira(self):
         if self.jira_github_tool:
-            pass
+            self.search_for_ticket_id_using_pr_status()
         else:
             self.search_for_ticket_id_using_search_api_call()
+
+    def search_for_ticket_id_using_pr_status(self):
+        # Below GET call is used to GET JIRA tickets by executing the JQL query
+        # URL : https://testautomatejira.atlassian.net/rest/api/2/search?jql=<JQL_QUERY>
+        try:
+            search_url = f"https://{self.jira_domain}{self.jira_domain_ext}/rest/api/2/search"
+            search_jql_query = f'''project = "{self.jira_project_name}" AND statusCategory = "In Progress" AND status in ({self.jql_issue_type}) AND development[pullrequests].all > 0 ORDER BY updated DESC'''
+            response = requests.request("GET", search_url, headers=self.headers, params={"jql": search_jql_query})
+            self.ticket_total = (response.json())["total"]
+            if self.ticket_total == 1:
+                self.issue_id = (response.json())["issues"][0]["id"]
+                self.ticket_id = (response.json())["issues"][0]["key"]
+            else:
+                self.issue_id = []
+                self.ticket_id = []
+                for i in range(0, len(self.ticket_total)):
+                    self.issue_id.append((response.json())["issues"][i]["id"])
+                    self.ticket_id.append((response.json())["issues"][i]["key"])
+                count = 0
+                # https://testautomatejira.atlassian.net/rest/dev-status/latest/issue/detail?issueId=<issue_id>&applicationType=GitHub&dataType=branch
+                for id in range(0, len(self.issue_id)):
+                    url = f"https://{self.jira_domain}{self.jira_domain_ext}/rest/dev-status/latest/issue/detail"
+                    params = {
+                        "issueId": self.issue_id[id],
+                        "applicationType": "Github",
+                        "dataType": "branch"
+                    }
+                    response = requests.request("GET", url, headers=self.headers, params=params)
+                    if self.pr_link in str(response.json()):
+                        pull_req_details = response.json()["detail"]["pullRequests"]
+                        for pr in pull_req_details:
+                            if self.pr_link in pr:
+                                if "MERGED" in pr["status"]:
+                                    if pr["source"]["branch"] == self.branch_name:
+                                        count = 1
+                                        break
+                        if count == 1:
+                            self.ticket_id = self.ticket_id[id]
+                            self.issue_id = self.issue_id[id]
+                            break
+        except Exception as exp:
+            print(exp)
+            self.ticket_id = None
+            self.issue_id = None
 
     def search_for_ticket_id_using_search_api_call(self):
         # Below GET call is used to GET JIRA tickets by executing the JQL query
@@ -70,12 +115,14 @@ class JiraIntegration:
             self.issue_id = None
             self.ticket_id = None
             search_url = f"https://{self.jira_domain}{self.jira_domain_ext}/rest/api/2/search"
-            search_jql_query = f'''project = '{self.prefix_ticket_value}' AND issuetype = "{self.jql_issue_type}" AND "{self.jql_column_name}" ~ "{self.pr_link}" ORDER BY created DESC '''
+            search_jql_query = f'''project = '{self.jira_project_name}' AND status in ({self.jql_issue_type}) AND "{self.jql_column_name}" ~ "{self.pr_link}" ORDER BY created DESC '''
             response = requests.request("GET", search_url, headers=self.headers, params={"jql": search_jql_query})
             self.ticket_total = (response.json())["total"]
             if self.ticket_total == 1:
                 self.issue_id = (response.json())["issues"][0]["id"]
                 self.ticket_id = (response.json())["issues"][0]["key"]
+            elif self.ticket_total == 0:
+                raise Exception("Ticket Not found")
             else:
                 self.issue_id = []
                 self.ticket_id = []
@@ -98,9 +145,10 @@ class JiraIntegration:
                         self.ticket_id = (response.json())["key"]
                 else:
                     pass
-                print(self.ticket_id, self.issue_id)
         except Exception as exp:
             print(exp)
+            self.ticket_id = None
+            self.issue_id = None
 
     def make_build_status_comment(self):
         self.build_status_dict = {"0": "Passed", "1": "Failed"}
@@ -134,7 +182,7 @@ if __name__ == "__main__":
     load_dotenv(dotenv_path)
     env_vars = {
         "AUTH_TOKEN": os.environ.get("AUTH_TOKEN", False),
-        "PREFIX_TICKET_VALUE": os.environ.get("PREFIX_TICKET_VALUE", False),
+        "JIRA_PROJECT_NAME": os.environ.get("JIRA_PROJECT_NAME", False),
         "PASS_STATUS_TRANSITION": os.environ.get("PASS_STATUS_TRANSITION", 0),
         "JIRA_DOMAIN": os.environ.get("JIRA_DOMAIN", False),
         "FAIL_STATUS_TRANSITION": os.environ.get("FAIL_STATUS_TRANSITION", 0),
@@ -149,12 +197,10 @@ if __name__ == "__main__":
         "BRANCH_NAME": os.environ.get("BRANCH_NAME", False),
         "JQL_COLUMN_NAME": os.environ.get("JQL_COLUMN_NAME", None),
         "JQL_ISSUE_TYPE": os.environ.get("JQL_ISSUE_TYPE", None),
-        "report_status": "1",
+        "report_status": "0",
     }
     test_obj = JiraIntegration(**env_vars)
-    test_obj.search_for_ticket_id_using_search_api_call()
+    test_obj.find_ticket_id_in_jira()
     test_obj.make_build_status_comment()
     test_obj.add_comment_to_ticket_id()
     test_obj.make_transitions_to_ticket()
-
-
