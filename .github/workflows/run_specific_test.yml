@@ -49,6 +49,7 @@ jobs:
           echo $BRANCH_NAME_ENV
           echo $GIT_PR_NUMBER
           pytest test_one.py
+          echo $report_status
 
       - name: Execute Functional Cases
         if: ${{ always() && env.TC_FUNCTIONAL_EXECUTION == 'True'}}
