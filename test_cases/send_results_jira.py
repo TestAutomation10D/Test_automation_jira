@@ -15,8 +15,8 @@ class TestSendResultJira:
             "PASS_STATUS_TRANSITION": os.environ.get("PASS_STATUS_TRANSITION", None),
             "JIRA_DOMAIN": os.environ.get("JIRA_DOMAIN", None),
             "FAIL_STATUS_TRANSITION": os.environ.get("FAIL_STATUS_TRANSITION", None),
-            "JIRA_CONDITION": os.environ.get("JIRA_CONDITION", None),
-            "JIRA_GITHUB_TOOL": os.environ.get("JIRA_GITHUB_TOOL", None),
+            "JIRA_CONDITION": os.environ.get("JIRA_CONDITION", False),
+            "JIRA_GITHUB_TOOL": os.environ.get("JIRA_GITHUB_TOOL", False),
             "REPORT_STATUS": os.environ.get("REPORT_STATUS"),
             "REPORT_NAME": os.environ.get("REPORT_NAME"),
             "REPORT_PATH": os.environ.get("REPORT_PATH")
