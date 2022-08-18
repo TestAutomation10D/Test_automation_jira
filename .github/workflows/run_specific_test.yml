@@ -49,7 +49,6 @@ jobs:
           echo $BRANCH_NAME_ENV
           echo $GIT_PR_NUMBER
           pytest test_one.py
-          echo $report_status
 
       - name: Execute Functional Cases
         if: ${{ always() && env.TC_FUNCTIONAL_EXECUTION == 'True'}}
@@ -59,7 +58,6 @@ jobs:
           echo $GIT_ORG_NAME
           echo $BRANCH_NAME_ENV
           echo $GIT_PR_NUMBER
-          echo $report_status
           pytest test_one.py
 
       - name: Execute Integration Cases
