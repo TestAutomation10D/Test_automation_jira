@@ -15,4 +15,5 @@ def test_one():
     response = requests.request("GET", url, headers=headers)
 
     print(response.text)
+    os.environ['GIT_PR_NUMBER'] = "Updated value 123"
     assert 1 == 2
