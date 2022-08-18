@@ -22,7 +22,7 @@ jobs:
 
       - name: SET Pull Request and ENV Information
         run: |
-          echo GIT_PR_NUMBER="12345" >> $GITHUB_ENV
+          echo GIT_PR_NUMBER="17" >> $GITHUB_ENV
           echo GIT_REPOSITORY_NAME="${{ github.event.repository.name }}" >> $GITHUB_ENV
           echo GIT_ORG_NAME="${{ github.repository_owner }}" >> $GITHUB_ENV
           echo "BRANCH_NAME_ENV=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
@@ -46,7 +46,7 @@ jobs:
           echo $GIT_ORG_NAME
           echo $BRANCH_NAME_ENV
           echo $GIT_PR_NUMBER
-          pytest test_one.py
+          pytest ./test_cases/ui/test_report_extract.py
 
       - name: Execute Functional Cases
         if: ${{ always() && env.TC_FUNCTIONAL_EXECUTION == 'True'}}
@@ -56,14 +56,17 @@ jobs:
           echo $GIT_ORG_NAME
           echo $BRANCH_NAME_ENV
           echo $GIT_PR_NUMBER
-          pytest test_one.py
+          echo $JIRA_TICKET
+          echo $JIRA_ISSUE_ID
+          echo $REPORT_STATUS
+          pytest ./test_cases/send_results_jira.py
 
-      - name: Execute Integration Cases
-        if: ${{ always() && env.TC_INTEGRATION_EXECUTION == 'True'}}
-        run: |
-          echo "Integration cases"
-          echo $GIT_REPOSITORY_NAME
-          echo $GIT_ORG_NAME
-          echo $BRANCH_NAME_ENV
-          echo $GIT_PR_NUMBER
-          pytest test_one.py
+#       - name: Execute Integration Cases
+#         if: ${{ always() && env.TC_INTEGRATION_EXECUTION == 'True'}}
+#         run: |
+#           echo "Integration cases"
+#           echo $GIT_REPOSITORY_NAME
+#           echo $GIT_ORG_NAME
+#           echo $BRANCH_NAME_ENV
+#           echo $GIT_PR_NUMBER
+#           pytest test_one.py
