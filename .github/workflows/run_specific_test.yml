@@ -59,7 +59,7 @@ jobs:
           echo $JIRA_TICKET
           echo $JIRA_ISSUE_ID
           echo $REPORT_STATUS
-          pytest ./test_cases/send_results_jira.py
+          pytest --noconftest ./test_cases/send_results_jira.py
 
 #       - name: Execute Integration Cases
 #         if: ${{ always() && env.TC_INTEGRATION_EXECUTION == 'True'}}
