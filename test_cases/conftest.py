@@ -299,7 +299,7 @@ def collect_screenshot(item, report):
         if env_file:
             if not os.environ.get("REPORT_STATUS"):
                 with open(env_file, "a") as myfile:
-                    myfile.write("REPORT_STATUS='1'")
+                    myfile.write("REPORT_STATUS='1'\n")
         else:
             if not os.environ.get("REPORT_STATUS"):
                 os.environ["REPORT_STATUS"] = "1"

@@ -70,8 +70,8 @@ class JiraIntegration:
         env_file = os.getenv('GITHUB_ENV')
         if env_file:
             with open(env_file, "a") as myfile:
-                myfile.write(f"JIRA_TICKET='{self.ticket_id}'")
-                myfile.write(f"JIRA_ISSUE_ID='{self.issue_id}'")
+                 myfile.write(f"JIRA_TICKET='{self.ticket_id}'\n")
+                myfile.write(f"JIRA_ISSUE_ID='{self.issue_id}'\n")
         else:
             if not os.environ.get("JIRA_TICKET_ID"):
                 os.environ["JIRA_TICKET_ID"] = self.ticket_id
