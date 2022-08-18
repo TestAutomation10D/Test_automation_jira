@@ -17,6 +17,10 @@ class TestSendResultJira:
             "FAIL_STATUS_TRANSITION": os.environ.get("FAIL_STATUS_TRANSITION", None),
             "JIRA_CONDITION": os.environ.get("JIRA_CONDITION", False),
             "JIRA_GITHUB_TOOL": os.environ.get("JIRA_GITHUB_TOOL", False),
+            "GIT_PR_NUMBER": os.environ.get("GIT_PR_NUMBER"),
+            "GIT_REPOSITORY_NAME": os.environ.get("GIT_REPOSITORY_NAME"),
+            "GIT_ORG_NAME": os.environ.get("GIT_ORG_NAME"),
+            "BRANCH_NAME": os.environ.get("BRANCH_NAME"),
             "REPORT_STATUS": os.environ.get("REPORT_STATUS"),
             "REPORT_NAME": os.environ.get("REPORT_NAME"),
             "REPORT_PATH": os.environ.get("REPORT_PATH")
