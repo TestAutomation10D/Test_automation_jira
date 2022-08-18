@@ -299,10 +299,10 @@ def collect_screenshot(item, report):
         if env_file:
             if not os.environ.get("REPORT_STATUS"):
                 with open(env_file, "a") as myfile:
-                    myfile.write("REPORT_STATUS='1'\n")
+                    myfile.write("REPORT_STATUS=1\n")
         else:
             if not os.environ.get("REPORT_STATUS"):
-                os.environ["REPORT_STATUS"] = "1"
+                os.environ["REPORT_STATUS"] = '1'
         REPORT_STATUS = '1'
 
     if "ui" in location[0] and (report.when == 'call' or report.when == "setup"):
