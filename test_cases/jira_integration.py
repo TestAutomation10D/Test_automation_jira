@@ -173,12 +173,12 @@ class JiraIntegration:
             try:
                 if self.report_status:
                     self.build_status_dict = {"0": "Passed", "1": "Failed"}
-                    self.build_status = "Build is " + self.build_status_dict[str(self.report_status)] + f"\nFor PR LINK : {self.pr_link}"
+                    self.build_status = "Build is " + self.build_status_dict[str(int(self.report_status))] + f"\nFor PR LINK : {self.pr_link}"
                 else:
                     raise ValueError("REPORT STATUS is not having a value")
             except Exception as exp:
                 print(exp)
-                pass
+                raise Exception("Exception raised")
 
     def add_comment_to_ticket_id(self):
         if self.jira_condition:
