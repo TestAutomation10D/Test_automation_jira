@@ -58,6 +58,7 @@ jobs:
           echo $GIT_ORG_NAME
           echo $BRANCH_NAME_ENV
           echo $GIT_PR_NUMBER
+          echo $report_status
           pytest test_one.py
 
       - name: Execute Integration Cases
