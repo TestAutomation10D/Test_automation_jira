@@ -227,6 +227,9 @@ def collect_screenshot(item, report):
     # screenshot and display it in the html report
 
     location = getattr(report, 'location', [])
+    
+    if report.outcome in ["failed"]:
+        os.environ['report_status'] = "1"
 
     if "ui" in location[0] and (report.when == 'call' or report.when == "setup"):
         if report.outcome in ["skipped", "failed"]:
