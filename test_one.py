@@ -15,5 +15,8 @@ def test_one():
     response = requests.request("GET", url, headers=headers)
 
     print(response.text)
-    os.environ['GIT_PR_NUMBER'] = "Updated value 123"
+    env_file = os.getenv('GITHUB_ENV')
+
+    with open(env_file, "a") as myfile:
+        myfile.write("REPORT_STATUS='1'")
     assert 1 == 2
