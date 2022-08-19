@@ -112,9 +112,8 @@ class JiraIntegration:
                             for pr in pull_req_details:
                                 if self.pr_link in pr:
                                     if "MERGED" in pr["status"]:
-                                        if pr["source"]["branch"] == self.branch_name:
-                                            count = 1
-                                            break
+                                        count = 1
+                                        break
                             if count == 1:
                                 self.ticket_id = self.ticket_id[id]
                                 self.issue_id = self.issue_id[id]
@@ -259,8 +258,8 @@ if __name__ == "__main__":
 
     test_obj = JiraIntegration(**env_vars)
     test_obj.ticket_id = "TP-1"
-    # test_obj.find_ticket_id_in_jira()
-    # test_obj.make_build_status_comment()
-    # test_obj.add_comment_to_ticket_id()
-    # test_obj.make_transitions_to_ticket()
+    test_obj.find_ticket_id_in_jira()
+    test_obj.make_build_status_comment()
+    test_obj.add_comment_to_ticket_id()
+    test_obj.make_transitions_to_ticket()
     test_obj.add_attachment_to_jira_ticket()
