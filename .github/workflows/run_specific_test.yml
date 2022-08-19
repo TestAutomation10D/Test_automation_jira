@@ -46,7 +46,8 @@ jobs:
           echo $GIT_ORG_NAME
           echo $BRANCH_NAME
           echo $GIT_PR_NUMBER
-          pytest ./test_cases/ui/test_report_extract.py
+          REPORT_NAME="SANITY REPORT" pytest ./test_cases/ui/test_report_extract.py
+          echo $REPORT_NAME
 
       - name: Execute Functional Cases
         if: ${{ always() && env.TC_FUNCTIONAL_EXECUTION == 'True'}}
@@ -59,7 +60,8 @@ jobs:
           echo $JIRA_TICKET_ID
           echo $JIRA_ISSUE_ID
           echo $REPORT_STATUS
-          pytest test_one.py
+          REPORT_NAME="FUNCTIONAL REPORT" pytest ./test_cases/ui/test_report_extract.py
+          echo $REPORT_NAME
       
       - name: Execute Integration Cases
         if: ${{ always() && env.TC_INTEGRATION_EXECUTION == 'True'}}
@@ -72,7 +74,8 @@ jobs:
           echo $JIRA_TICKET_ID
           echo $JIRA_ISSUE_ID
           echo $REPORT_STATUS
-          pytest test_one.py
+          REPORT_NAME="INTEGRATION REPORT" pytest ./test_cases/ui/test_report_extract.py
+          echo $REPORT_NAME
 
       - name: Send results to jira
         if: ${{ always() && env.JIRA_CONDITION == 'True'}}
