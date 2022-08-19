@@ -226,10 +226,10 @@ def test_report_ext():
     profile.set_preference('browser.download.manager.showWhenStarting', False)
     report_path = main_file_path_report.split("/")
     env_vars["REPORT_NAME"] = report_path[len(report_path) - 2]
-    os.environ["REPORT_NAME"] = env_vars["REPORT_NAME"]
+    os.environ["REPORT_NAME"] = env_vars["REPORT_NAME"].split("_2022_")[0]
     report_path = main_file_path_report.replace(report_path[len(report_path) - 1], "")[1:]
-    env_vars["REPORT_PATH"] = os.getcwd() + report_path + "downloaded_files"
-    profile.set_preference('browser.download.dir', env_vars["REPORT_PATH"]+"/")
+    env_vars["REPORT_PATH"] = os.getcwd() + report_path + "downloaded_files/"
+    profile.set_preference('browser.download.dir', env_vars["REPORT_PATH"])
     profile.set_preference('browser.helperApps.neverAsk.saveToDisk', 'text/plain,application/pdf')
     profile.set_preference('print.always_print_silent', True)
     profile.set_preference("pdfjs.disabled", True)
