@@ -112,9 +112,8 @@ class JiraIntegration:
                             for pr in pull_req_details:
                                 if self.pr_link in pr:
                                     if "MERGED" in pr["status"]:
-                                        if pr["source"]["branch"] == self.branch_name:
-                                            count = 1
-                                            break
+                                        count = 1
+                                        break
                             if count == 1:
                                 self.ticket_id = self.ticket_id[id]
                                 self.issue_id = self.issue_id[id]
