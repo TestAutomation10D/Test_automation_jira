@@ -23,9 +23,9 @@ jobs:
       - name: SET Pull Request and ENV Information
         run: |
           echo GIT_PR_NUMBER="17" >> $GITHUB_ENV
-          echo GIT_REPOSITORY_NAME="${{ github.event.repository.name }}" >> $GITHUB_ENV
-          echo GIT_ORG_NAME="${{ github.repository_owner }}" >> $GITHUB_ENV
-          echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+          echo GIT_REPOSITORY_NAME=Jira_integration >> $GITHUB_ENV
+          echo GIT_ORG_NAME=Surya10d >> $GITHUB_ENV
+          echo "BRANCH_NAME=Add_image_on_pass" >> $GITHUB_ENV
           echo TC_SANITY_EXECUTION=$(echo ${{ secrets.TC_SANITY_EXECUTION }}) >> $GITHUB_ENV
           echo PREFIX_TICKET_VALUE=$(echo ${{ secrets.PREFIX_TICKET_VALUE }}) >> $GITHUB_ENV
           echo AUTH_TOKEN=$(echo ${{ secrets.AUTH_TOKEN }}) >> $GITHUB_ENV
@@ -37,6 +37,9 @@ jobs:
           echo TC_FUNCTIONAL_EXECUTION=$(echo ${{ secrets.TC_FUNCTIONAL_EXECUTION }}) >> $GITHUB_ENV
           echo TC_INTEGRATION_EXECUTION=$(echo ${{ secrets.TC_INTEGRATION_EXECUTION }}) >> $GITHUB_ENV
 #          echo GIT_PR_NUMBER="${{ github.event.number }}" >> $GITHUB_ENV
+#          echo GIT_REPOSITORY_NAME="${{ github.event.repository.name }}" >> $GITHUB_ENV
+#          echo GIT_ORG_NAME="${{ github.repository_owner }}" >> $GITHUB_ENV
+#          echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
 
       - name: Execute Sanity Cases
         if: ${{ always() && env.TC_SANITY_EXECUTION == 'True' }}
