@@ -302,5 +302,3 @@ def send_failed_doc_to_jira(ticket_id, doc_path):
     # Below post call is used to add the document on JIRA tickets
     # URL : https://testautomatejira.atlassian.net/rest/api/2/issue/{ticket_id}/attachments"
     requests.request("POST", doc_url, headers=headers, files=files)
-
-
