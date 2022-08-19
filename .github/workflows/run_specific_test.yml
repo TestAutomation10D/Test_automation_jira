@@ -75,5 +75,6 @@ jobs:
           pytest test_one.py
 
       - name: Send results to jira
+        if: ${{ always() && env.JIRA_CONDITION == 'True'}}
         run: pytest --noconftest -s -v ./test_cases/send_results_jira.py
 
