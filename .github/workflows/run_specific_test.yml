@@ -25,7 +25,7 @@ jobs:
           echo GIT_PR_NUMBER="17" >> $GITHUB_ENV
           echo GIT_REPOSITORY_NAME="${{ github.event.repository.name }}" >> $GITHUB_ENV
           echo GIT_ORG_NAME="${{ github.repository_owner }}" >> $GITHUB_ENV
-          echo "BRANCH_NAME_ENV=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+          echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
           echo TC_SANITY_EXECUTION=$(echo ${{ secrets.TC_SANITY_EXECUTION }}) >> $GITHUB_ENV
           echo PREFIX_TICKET_VALUE=$(echo ${{ secrets.PREFIX_TICKET_VALUE }}) >> $GITHUB_ENV
           echo AUTH_TOKEN=$(echo ${{ secrets.AUTH_TOKEN }}) >> $GITHUB_ENV
@@ -44,7 +44,7 @@ jobs:
           echo "Sanity cases"
           echo $GIT_REPOSITORY_NAME
           echo $GIT_ORG_NAME
-          echo $BRANCH_NAME_ENV
+          echo $BRANCH_NAME
           echo $GIT_PR_NUMBER
           pytest ./test_cases/ui/test_report_extract.py
 
@@ -54,19 +54,26 @@ jobs:
           echo "Functional cases"
           echo $GIT_REPOSITORY_NAME
           echo $GIT_ORG_NAME
-          echo $BRANCH_NAME_ENV
+          echo $BRANCH_NAME
           echo $GIT_PR_NUMBER
           echo $JIRA_TICKET_ID
           echo $JIRA_ISSUE_ID
           echo $REPORT_STATUS
-          pytest --noconftest -s -v ./test_cases/send_results_jira.py
+          pytest test_one.py
+      
+      - name: Execute Integration Cases
+        if: ${{ always() && env.TC_INTEGRATION_EXECUTION == 'True'}}
+        run: |
+          echo "Integration cases"
+          echo $GIT_REPOSITORY_NAME
+          echo $GIT_ORG_NAME
+          echo $BRANCH_NAME
+          echo $GIT_PR_NUMBER
+          echo $JIRA_TICKET_ID
+          echo $JIRA_ISSUE_ID
+          echo $REPORT_STATUS
+          pytest test_one.py
 
-#       - name: Execute Integration Cases
-#         if: ${{ always() && env.TC_INTEGRATION_EXECUTION == 'True'}}
-#         run: |
-#           echo "Integration cases"
-#           echo $GIT_REPOSITORY_NAME
-#           echo $GIT_ORG_NAME
-#           echo $BRANCH_NAME_ENV
-#           echo $GIT_PR_NUMBER
-#           pytest test_one.py
+      - name: Send results to jira
+        run: pytest --noconftest -s -v ./test_cases/send_results_jira.py
+
