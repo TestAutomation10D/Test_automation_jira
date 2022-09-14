@@ -297,10 +297,9 @@ def collect_screenshot(item, report):
     if report.outcome in ["failed"]:
         env_file = os.getenv('GITHUB_ENV')
         if env_file:
-            if not os.environ.get("REPORT_STATUS"):
-                with open(env_file, "a") as myfile:
-                    myfile.write("REPORT_STATUS=1\n")
-                    print("Report status variable set in github")
+            with open(env_file, "a") as myfile:
+                myfile.write("REPORT_STATUS=1\n")
+                print("Report status variable set in github")
         else:
             if not os.environ.get("REPORT_STATUS"):
                 os.environ["REPORT_STATUS"] = '1'
