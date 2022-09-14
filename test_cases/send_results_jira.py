@@ -34,3 +34,4 @@ class TestSendResultJira:
         self.jira_obj.make_build_status_comment()
         self.jira_obj.add_comment_to_ticket_id()
         self.jira_obj.make_transitions_to_ticket()
+
