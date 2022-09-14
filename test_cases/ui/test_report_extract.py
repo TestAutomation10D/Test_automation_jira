@@ -15,7 +15,7 @@ def test_report_ext(driver):
 
     driver.get("https://www.google.com/")
     time.sleep(4)
-    assert 1 == 2
+    # assert 1 == 2
     # driver.execute_script("var a = document.querySelector('title'); a.innerText = 'SANITY REPORT'")
     # driver.execute_script("""var a = document.querySelector('[class="header__title"]'); a.innerText = 'SANITY REPORT'""")
     # driver.find_element(*dashboard_pdf).click()
