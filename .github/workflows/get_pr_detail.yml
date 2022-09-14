@@ -2,7 +2,7 @@ name: Run workflow for PR
 on:
   pull_request:
     branches:
-      - jira_with_github_integration
+      - test_1_jira_workflow
     types:
       - closed
 jobs:
