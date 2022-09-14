@@ -47,7 +47,7 @@ class JiraIntegration:
         self.jira_domain_ext = ".atlassian.net"
         self.headers = {
             'Authorization': f'Basic {self.auth_token}',
-            'Content-Type': 'application/json'
+            'content-type': 'application/json'
         }
         self.report_status = REPORT_STATUS
         self.git_domain = "https://github.com/"
@@ -94,7 +94,7 @@ class JiraIntegration:
                 else:
                     self.issue_id = []
                     self.ticket_id = []
-                    for i in range(0, len(self.ticket_total)):
+                    for i in range(0, self.ticket_total):
                         self.issue_id.append((response.json())["issues"][i]["id"])
                         self.ticket_id.append((response.json())["issues"][i]["key"])
                     count = 0
@@ -103,14 +103,14 @@ class JiraIntegration:
                         url = f"https://{self.jira_domain}{self.jira_domain_ext}/rest/dev-status/latest/issue/detail"
                         params = {
                             "issueId": self.issue_id[id],
-                            "applicationType": "Github",
+                            "applicationType": "GitHub",
                             "dataType": "branch"
                         }
                         response = requests.request("GET", url, headers=self.headers, params=params)
                         if self.pr_link in str(response.json()):
-                            pull_req_details = response.json()["detail"]["pullRequests"]
+                            pull_req_details = response.json()["detail"][0]["pullRequests"]
                             for pr in pull_req_details:
-                                if self.pr_link in pr:
+                                if self.pr_link in str(pr):
                                     if "MERGED" in pr["status"]:
                                         count = 1
                                         break
@@ -257,7 +257,7 @@ if __name__ == "__main__":
     }
 
     test_obj = JiraIntegration(**env_vars)
-    test_obj.ticket_id = "TP-1"
+    # test_obj.ticket_id = "TP-2"
     test_obj.find_ticket_id_in_jira()
     test_obj.make_build_status_comment()
     test_obj.add_comment_to_ticket_id()
