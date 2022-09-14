@@ -300,6 +300,7 @@ def collect_screenshot(item, report):
             if not os.environ.get("REPORT_STATUS"):
                 with open(env_file, "a") as myfile:
                     myfile.write("REPORT_STATUS=1\n")
+                    print("Report status variable set in github")
         else:
             if not os.environ.get("REPORT_STATUS"):
                 os.environ["REPORT_STATUS"] = '1'
