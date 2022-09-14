@@ -15,4 +15,4 @@ def test_one():
     response = requests.request("GET", url, headers=headers)
 
     print(response.text)
-    assert 1 == 2
+    # assert 1 == 2
