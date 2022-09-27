@@ -25,8 +25,11 @@ JIRA_DOMAIN = None
 PASS_STATUS_TRANSITION = None
 FAIL_STATUS_TRANSITION = None
 JIRA_CONDITION = None
+CLIENT_ID = None
+CLIENT_SECRET = None
 testcase_comment = None
 img_path = None
+project_key = {}
 jira_api_endpoint = ".atlassian.net/rest/api/2/issue"
 
 
@@ -128,7 +131,7 @@ def pytest_collection_modifyitems(session, config, items):
 
 
 def get_env_values():
-    global AUTH_TOKEN, PREFIX_TICKET_VALUE, JIRA_DOMAIN, PASS_STATUS_TRANSITION, FAIL_STATUS_TRANSITION, JIRA_CONDITION
+    global AUTH_TOKEN, PREFIX_TICKET_VALUE, JIRA_DOMAIN, PASS_STATUS_TRANSITION, FAIL_STATUS_TRANSITION, JIRA_CONDITION, CLIENT_ID, CLIENT_SECRET
 
     dotenv_path = join(dirname(__file__), '.env')
     load_dotenv(dotenv_path)
@@ -138,6 +141,9 @@ def get_env_values():
     PASS_STATUS_TRANSITION = os.environ.get("PASS_STATUS_TRANSITION")
     FAIL_STATUS_TRANSITION = os.environ.get("FAIL_STATUS_TRANSITION")
     JIRA_CONDITION = os.environ.get("JIRA_CONDITION", None)
+    CLIENT_ID = os.environ.get("CLIENT_ID")
+    CLIENT_SECRET = os.environ.get("CLIENT_SECRET")
+
 
 
 def setup_module(module):
@@ -160,6 +166,8 @@ def pytest_runtest_makereport(item):
     """
     This is called as each test ends
     """
+    global project_key
+
     outcome = yield
     result = outcome.get_result()
 
@@ -167,17 +175,113 @@ def pytest_runtest_makereport(item):
     if result.when == "call" and JIRA_CONDITION:
         try:
             with open(log_file, "a") as f:
-                f.write(result.nodeid + "   " + result.outcome + "   " + str(result.duration)+"\n")
-            ticket_id = next(pytest_id_value)
-            if ticket_id in result.nodeid:
-                send_results_to_jira(result, ticket_id)
-            elif ticket_id not in result.nodeid:
-                ticket_id = f"{PREFIX_TICKET_VALUE}"+(result.nodeid.replace("_", "-")).split(f"{PREFIX_TICKET_VALUE}")[1][:-1]
-                send_results_to_jira(result, ticket_id)
+                ticket_id = next(pytest_id_value)
+                f.write(result.nodeid + "   " + result.outcome + "   " + str(result.duration)+" Ticket ID - "+ticket_id+"\n")
+                proj_key = ticket_id.split("-")[0]
+                if proj_key in project_key.keys():
+                    execute_testcase_in_testexecution(project_key[proj_key], ticket_id, result.outcome)
+                else:
+                    project_id = get_project_id(proj_key)
+                    issue_type_id = get_issue_type_id(proj_key, "Test Execution")
+                    test_exec_key = create_ticket(project_id, issue_type_id)
+                    project_key[proj_key] = test_exec_key
+                    execute_testcase_in_testexecution(project_key[proj_key], ticket_id, result.outcome)
+            # ticket_id = next(pytest_id_value)
+            # if ticket_id in result.nodeid:
+            #     send_results_to_jira(result, ticket_id)
+            # elif ticket_id not in result.nodeid:
+            #     ticket_id = f"{PREFIX_TICKET_VALUE}"+(result.nodeid.replace("_", "-")).split(f"{PREFIX_TICKET_VALUE}")[1][:-1]
+            #     send_results_to_jira(result, ticket_id)
         except Exception as e:
             print("Error", e)
             pass
     collect_screenshot(item, result)
+
+
+def authenticate_xray_api():
+    auth_cred = { "client_id": CLIENT_ID,"client_secret": CLIENT_SECRET }
+    token = requests.request(url="https://xray.cloud.getxray.app/api/v1/authenticate", method="POST",
+                     json=auth_cred)
+    return json.loads(token.text)
+
+
+def execute_testcase_in_testexecution(key, test_case_id, status):
+    try:
+        token = authenticate_xray_api()
+        headers = {"Authorization": f"Bearer {str(token)}",
+                   "Content-Type": "application/json"}
+        payload = {
+        "testExecutionKey": key,
+        "info" : {
+            "summary" : "Execution of automated tests for release v1.3",
+            "description" : "This execution is automatically created when importing execution results from an external source",
+        },
+        "tests" : [
+            {
+                "testKey": test_case_id,
+                "comment": "Successful execution" if status == "passed" else "Execution failed",
+                "status": status.upper()
+            }
+        ]
+    }
+        requests.request(url="https://xray.cloud.xpand-it.com/api/v1/import/execution", method="POST", headers=headers,
+                         json=payload, verify=False)
+    except Exception as e:
+        logger.info("Exception occured when linking test case to test execution", e)
+
+
+def create_ticket(project_id, issue_type_id, summary="Test Execution summary",
+                  description="Description of the Test Execution"):
+    payload = {
+    "fields": {
+        "project": {
+            "id": project_id
+        },
+        "summary": summary,
+        "description": description,
+        "issuetype": {
+            "id": issue_type_id
+            }
+        }
+    }
+    headers = {"Authorization": "Basic c3VyeWEubXIramlyYTFAMTBkZWNvZGVycy5pbjpnRTByeFptRzBEalQ0SXo3TkU4YUYzM0Y=",
+               "Content-Type": "application/json"}
+    url = f"https://{JIRA_DOMAIN}{jira_api_endpoint}"
+    response = requests.request(url=url, method="POST", json=payload, headers=headers)
+    exec_ticket_info = json.loads(response.content)
+    return exec_ticket_info['key']
+
+
+def get_project_id(proj_key):
+    try:
+
+        url = f"https://{JIRA_DOMAIN}.atlassian.net/rest/api/2/project"
+        headers ={"Authorization": "Basic c3VyeWEubXIramlyYTFAMTBkZWNvZGVycy5pbjpnRTByeFptRzBEalQ0SXo3TkU4YUYzM0Y=",
+                  "Content-Type": "application/json"}
+        response = requests.request(url=url, method="GET", headers=headers)
+        for res in json.loads(response.content):
+            if res['key'] == proj_key:
+                return res['id']
+    except Exception as e:
+        logger.info("Error occured when getting project id")
+
+
+def get_issue_type_id(proj_key, issue_type):
+    try:
+        url = f"https://{JIRA_DOMAIN}.atlassian.net/rest/api/2/project/{proj_key}"
+        headers = {"Authorization": "Basic c3VyeWEubXIramlyYTFAMTBkZWNvZGVycy5pbjpnRTByeFptRzBEalQ0SXo3TkU4YUYzM0Y=",
+                   "Content-Type": "application/json"}
+        response = requests.request(url=url, method="GET", headers=headers)
+        issues = json.loads(response.content)
+        if issues['issueTypes']:
+            for issue in issues['issueTypes']:
+                if issue['name'] == issue_type:
+                    return issue['id']
+        else:
+            raise Exception("No issue types in response")
+
+    except Exception as e:
+        logger.info("Exception occured in getting issue type id", e)
 
 
 def send_results_to_jira(result, ticket_id):
@@ -204,7 +308,6 @@ def send_results_to_jira(result, ticket_id):
     # URL : https://testautomatejira.atlassian.net/rest/api/2/issue/{ticket_id}/transitions"
     transition_url = f"https://{JIRA_DOMAIN}{jira_api_endpoint}/{ticket_id}/transitions"
     apply_transition_to_jira_tickets(transition_url, headers=headers, status=result.outcome)
-
 
 
 def apply_transition_to_jira_tickets(transition_url, headers, status):
